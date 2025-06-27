@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>InsureAI – Insurance Chat Assistant</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #e3f2fd, #ffffff);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .chat-container {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0d47a1;
+      margin-bottom: 20px;
+    }
+
+    .chat-window {
+      background-color: #f4f6f8;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 12px;
+      border-radius: 10px;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .user-message {
+      background-color: #e3f2fd;
+      align-self: flex-end;
+    }
+
+    .bot-message {
+      background-color: #d1ecf1;
+      align-self: flex-start;
+    }
+
+    .input-area {
+      display: flex;
+      margin-top: 20px;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex-grow: 1;
+      padding: 14px 16px;
+      font-size: 15px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 15px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0d47a1;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 12px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h1>🤖 InsureAI – Your Insurance Assistant</h1>
+    <div id="chat" class="chat-window">
+      <!-- Chat messages will be appended here -->
+    </div>
+    <div class="input-area">
+      <input id="query" type="text" placeholder="Ask your insurance question..." />
+      <button onclick="send()">Send</button>
+    </div>
+    <div class="footer">Built with ❤️ for DSW GenAI Challenge</div>
+  </div>
+
+  <script>
+    async function send() {
+      const input = document.getElementById("query");
+      const chat = document.getElementById("chat");
+      const userQuery = input.value.trim();
+      if (!userQuery) return;
+
+      appendMessage("user-message", userQuery);
+      input.value = "";
+
+      appendMessage("bot-message", "⌛ Thinking...");
+
+      try {
+        const res = await fetch("/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ query: userQuery })
+        });
+
+        const data = await res.json();
+
+        // Remove the "Thinking..." message
+        const thinking = document.querySelector(".bot-message:last-child");
+        if (thinking && thinking.innerText.includes("Thinking")) {
+          thinking.remove();
+        }
+
+        appendMessage("bot-message", data.response);
+      } catch (error) {
+        appendMessage("bot-message", "❌ Sorry, there was an error!");
+      }
+    }
+
+    function appendMessage(type, text) {
+      const chat = document.getElementById("chat");
+      const msg = document.createElement("div");
+      msg.classList.add("message", type);
+      msg.innerText = text;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</body>
+</html>
