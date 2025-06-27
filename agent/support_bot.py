@@ -3,36 +3,44 @@ import requests
 from dotenv import load_dotenv
 
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+API_KEY = os.getenv("GROQ_API_KEY")
 
-def generate_response(user_query):
-    url = "https://api.groq.com/openai/v1/chat/completions"
+def generate_response(user_query, policy_text=None):
+    """
+    Generate a contextual response using Groq (LLaMA3) and the uploaded insurance document.
+    """
+    if not API_KEY:
+        return "❌ API key not found. Please check your .env file."
 
     headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
 
+    # Add document text to the system prompt
     SYSTEM_PROMPT = (
-        "You are InsureAI — an intelligent insurance advisor for Indian customers. "
-        "Always respond with fresh, accurate answers based on the user's question. "
-        "If the user asks about policy benefits, claims, types, or Indian insurance companies, reply accordingly. "
-        "Avoid repeating previous answers."
+        "You are InsureAI, an expert Indian insurance assistant. "
+        "Answer questions using only the uploaded document and your insurance knowledge. "
+        "Be concise, helpful, and avoid assuming anything not in the document."
     )
 
+    if policy_text:
+        SYSTEM_PROMPT += "\n\nPolicy Document:\n" + policy_text[:2000]  # Limit to 2000 chars
+
     payload = {
-        "model": "llama3-70b-8192",  # ✅ Better model than 8b
+        "model": "llama3-70b-8192",
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_query}
         ],
-        "temperature": 0.6
+        "temperature": 0.4
     }
 
-    response = requests.post(url, headers=headers, json=payload)
-
-    if response.status_code == 200:
-        return response.json()["choices"][0]["message"]["content"]
-    else:
-        print("Error:", response.status_code, response.text)
-        return "❌ Sorry, unable to answer right now."
+    try:
+        res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload)
+        if res.status_code == 200:
+            return res.json()['choices'][0]['message']['content']
+        else:
+            return f"❌ API error: {res.status_code} - {res.text}"
+    except Exception as e:
+        return f"❌ Exception occurred: {str(e)}"
