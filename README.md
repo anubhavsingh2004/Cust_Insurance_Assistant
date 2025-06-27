@@ -50,10 +50,10 @@ venv\Scripts\activate
 pip install -r requirements.txt
 
 # 4. Set your API key (Groq or OpenAI)
-export GROQ_API_KEY=your_api_key_here  # On Windows: set GROQ_API_KEY=your_key
-Run the App
-python app.py
-Open your browser and visit http://127.0.0.1:5000
+1. On Windows: set GROQ_API_KEY=your_key
+2. Run the App
+3. python app.py
+4. Open your browser and visit http://127.0.0.1:5000
 
 # How It Works
 1. User uploads a PDF policy document (e.g., health, home, car).
@@ -63,6 +63,6 @@ Open your browser and visit http://127.0.0.1:5000
 5. A well-formatted AI-generated answer is returned in real-time.
 
 # Example Use Case:
-Ask: "What does Clause 11 mean in this policy?"
-Upload: "sample_insurance_policy.pdf"
-Get: "Clause 11: Accidental damage to garden equipment..."
+- Ask: "What does Clause 11 mean in this policy?"
+- Upload: "sample_insurance_policy.pdf"
+- Get: "Clause 11: Accidental damage to garden equipment..."
