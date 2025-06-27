@@ -8,12 +8,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary: #1976d2;
-      --primary-dark: #115293;
-      --bot: #e3f2fd;
-      --user: #c8e6c9;
-      --bg: #f4f6f9;
-      --radius: 16px;
+      --primary: #26a69a;
+      --primary-dark: #1e8077;
+      --light: #f5f7fa;
+      --dark: #263238;
+      --gray: #90a4ae;
+      --radius: 12px;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
     * {
@@ -24,39 +25,37 @@
 
     body {
       font-family: 'Poppins', sans-serif;
-      background: var(--bg);
+      background: linear-gradient(135deg, #d0e8f2, #a0d9d9);
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
       padding: 20px;
     }
 
     .chat-container {
       width: 100%;
-      max-width: 800px;
+      max-width: 900px;
       background: white;
       border-radius: var(--radius);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow);
       overflow: hidden;
       display: flex;
       flex-direction: column;
       height: 90vh;
+      max-height: 800px;
     }
 
     .header {
-      background: linear-gradient(to right, var(--primary), var(--primary-dark));
+      background: var(--primary);
       color: white;
       padding: 20px;
       text-align: center;
     }
 
     .header h1 {
-      font-size: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+      font-size: 24px;
+      font-weight: 500;
     }
 
     .chat-window {
@@ -66,64 +65,59 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
-      background: #fafafa;
+      background-color: var(--light);
     }
 
     .message {
       max-width: 80%;
-      padding: 12px 16px;
+      padding: 15px 20px;
       border-radius: var(--radius);
       font-size: 15px;
+      position: relative;
       line-height: 1.5;
-      word-wrap: break-word;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      animation: fadeIn 0.3s ease-out;
     }
 
     .user-message {
+      background: white;
+      border: 1px solid #e0e0e0;
       align-self: flex-end;
-      background: var(--user);
+      box-shadow: var(--shadow);
       border-bottom-right-radius: 4px;
     }
 
     .bot-message {
+      background: white;
+      border: 1px solid #e0e0e0;
       align-self: flex-start;
-      background: var(--bot);
+      box-shadow: var(--shadow);
       border-bottom-left-radius: 4px;
+    }
+
+    .bot-message::before {
+      content: "InsureAI";
+      position: absolute;
+      top: -18px;
+      left: 0;
+      font-size: 11px;
+      color: var(--gray);
+    }
+
+    .user-message::before {
+      content: "You";
+      position: absolute;
+      top: -18px;
+      right: 0;
+      font-size: 11px;
+      color: var(--gray);
     }
 
     .input-area {
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
       padding: 15px;
-      border-top: 1px solid #ddd;
-      background: #fff;
-    }
-
-    .file-upload label {
-      display: flex;
-      align-items: center;
-      padding: 10px 14px;
-      background: #eee;
-      border-radius: var(--radius);
-      cursor: pointer;
-      gap: 8px;
-      font-size: 14px;
-    }
-
-    .file-upload input {
-      display: none;
-    }
-
-    .file-info {
-      font-size: 13px;
-      color: #666;
-      margin-left: 10px;
-      max-width: 140px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      background: white;
+      border-top: 1px solid #eee;
+      gap: 10px;
     }
 
     .input-group {
@@ -137,91 +131,73 @@
       padding: 12px 16px;
       font-size: 15px;
       border-radius: var(--radius);
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
       outline: none;
-      transition: 0.3s;
-    }
-
-    input[type="text"]:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
     }
 
     button {
-      background: var(--primary);
+      padding: 12px 20px;
+      font-size: 15px;
+      background-color: var(--primary);
       color: white;
       border: none;
-      padding: 12px 20px;
       border-radius: var(--radius);
       cursor: pointer;
-      font-size: 15px;
-      transition: 0.3s;
+    }
+
+    .file-upload {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .file-upload input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .file-upload label {
+      padding: 12px;
+      background: #f0f0f0;
+      border-radius: var(--radius);
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    button:hover {
-      background: var(--primary-dark);
-    }
-
-    .typing {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .typing-dot {
-      width: 8px;
-      height: 8px;
-      background: #aaa;
-      border-radius: 50%;
-      animation: bounce 1.2s infinite ease-in-out;
-    }
-
-    .typing-dot:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .typing-dot:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes bounce {
-      0%, 80%, 100% {
-        transform: translateY(0);
-      }
-      40% {
-        transform: translateY(-8px);
-      }
+    .file-info {
+      font-size: 13px;
+      color: var(--gray);
+      margin-left: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
     }
 
     .footer {
       text-align: center;
-      font-size: 12px;
       padding: 10px;
-      background: #f8f8f8;
-      color: #666;
-      border-top: 1px solid #ddd;
+      font-size: 12px;
+      color: var(--gray);
+      border-top: 1px solid #eee;
     }
 
-    @media (max-width: 768px) {
-      .chat-container {
-        height: 100vh;
-        border-radius: 0;
-      }
-
-      .input-area {
-        flex-direction: column;
-        gap: 10px;
-      }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
   <div class="chat-container">
     <div class="header">
-      <h1><i class="fas fa-robot"></i> InsureAI – Insurance Assistant</h1>
+      <h1>InsureAI – Intelligent Insurance Assistant</h1>
     </div>
 
     <div id="chat" class="chat-window">
@@ -239,19 +215,21 @@
       <div class="file-upload">
         <input type="file" id="file-input" accept=".pdf,.doc,.docx,.txt">
         <label for="file-input">
-          <i class="fas fa-paperclip"></i> Attach File
+          <i class="fas fa-paperclip"></i>
           <span class="file-info">No file selected</span>
         </label>
       </div>
 
       <div class="input-group">
-        <input id="query" type="text" placeholder="Ask your insurance question..." />
-        <button onclick="send()"><i class="fas fa-paper-plane"></i> Send</button>
+        <input id="query" type="text" placeholder="Ask about your insurance..." autocomplete="off" />
+        <button onclick="send()">
+          <i class="fas fa-paper-plane"></i> Send
+        </button>
       </div>
     </div>
 
     <div class="footer">
-      Built with ❤️ for DSW GenAI Challenge | Powered by Flask + Groq
+      Built with ❤️ for DSW GenAI Challenge | Secured with bank-level encryption
     </div>
   </div>
 
@@ -264,8 +242,9 @@
     fileInput.addEventListener('change', async function () {
       if (this.files && this.files[0]) {
         const file = this.files[0];
-        fileInfo.textContent = file.name;
-        appendMessage('user-message', `📄 Attached file: ${file.name}`);
+        const fileName = file.name;
+        fileInfo.textContent = fileName;
+        appendMessage('user-message', `📄 Attached file: ${fileName}`);
 
         const formData = new FormData();
         formData.append("file", file);
@@ -278,7 +257,7 @@
 
           const data = await res.json();
           if (data.status === "success") {
-            appendMessage('bot-message', `✅ File uploaded successfully! I'm ready to answer questions about "${file.name}".`);
+            appendMessage('bot-message', `✅ File uploaded successfully! I'm ready to answer questions about "${fileName}".`);
           } else {
             appendMessage('bot-message', '❌ File upload failed. Please try again.');
           }
@@ -298,7 +277,7 @@
       appendMessage('user-message', userQuery);
       queryInput.value = '';
 
-      const thinking = appendMessage('bot-message', '<div class="typing"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>');
+      const thinking = appendMessage('bot-message', '<div class="typing">Analyzing<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>');
 
       try {
         const res = await fetch("/ask", {

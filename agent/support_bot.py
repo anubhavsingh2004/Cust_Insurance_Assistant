@@ -2,33 +2,41 @@ import os
 import requests
 from dotenv import load_dotenv
 
+# Load environment variables (e.g., GROQ_API_KEY)
 load_dotenv()
-API_KEY = os.getenv("GROQ_API_KEY")
+
+# ✅ Set your Groq or OpenAI API key here
+API_KEY = os.getenv("GROQ_API_KEY")  # Change to OPENAI_API_KEY if using OpenAI
 
 def generate_response(user_query, policy_text=None):
-    """
-    Generate a contextual response using Groq (LLaMA3) and the uploaded insurance document.
-    """
     if not API_KEY:
-        return "❌ API key not found. Please check your .env file."
+        return "❌ API key not found."
 
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
 
-    # Add document text to the system prompt
+    # ✅ System prompt with instructions to format responses in clean HTML
     SYSTEM_PROMPT = (
-        "You are InsureAI, an expert Indian insurance assistant. "
-        "Answer questions using only the uploaded document and your insurance knowledge. "
-        "Be concise, helpful, and avoid assuming anything not in the document."
+        "You are InsureAI, an intelligent insurance assistant. "
+        "Always reply using well-formatted HTML. "
+        "Use <strong> for headings, <ul><li> for bullet points, <br> for line breaks, "
+        "and emoji bullets like ✅, ❌, 📌 where appropriate. "
+        "Keep answers clean, structured, and readable in a chat interface. "
+        "Always reference the policy text when available to answer user queries accurately."
     )
 
+    # ✅ Append the uploaded policy document to the prompt (if present)
     if policy_text:
-        SYSTEM_PROMPT += "\n\nPolicy Document:\n" + policy_text[:2000]  # Limit to 2000 chars
+        SYSTEM_PROMPT += (
+            "\n\nHere is the insurance policy document uploaded by the user. "
+            "Use this as your reference:\n"
+            + policy_text[:2000]  # only send first 2000 characters for safety
+        )
 
     payload = {
-        "model": "llama3-70b-8192",
+        "model": "llama3-70b-8192",  # or "gpt-4" if you're using OpenAI instead of Groq
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_query}
@@ -37,7 +45,10 @@ def generate_response(user_query, policy_text=None):
     }
 
     try:
+        # ✅ Send request to the Groq API (or OpenAI if configured)
         res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload)
+
+        # Return the model's response if successful
         if res.status_code == 200:
             return res.json()['choices'][0]['message']['content']
         else:
